@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const flash = require("express-flash");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const serverless = require("serverless-http");
 
 dotenv.config();
 
@@ -36,6 +37,15 @@ app.use(methodOverride("_method"));
 route(app);
 routeAdmin(app);
 
-app.listen(port, () => {
-  console.log(`Server chay o ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Server chay o ${port}`);
+// });
+
+if (process.env.NODE_ENV !== "production") {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`App chạy ở localhost tại port ${port}`);
+  });
+}
+
+module.exports = serverless(app);
