@@ -1,9 +1,8 @@
-const Product = require("../../models/product.model");
+const ProductCategory = require("../../models/product-category.model");
+const systemConfig = require("../../config/system");
 const filterStatusHelper = require("../../helpers/filterStatus");
 const searchHelper = require("../../helpers/search");
 const paginationHelper = require("../../helpers/pagination");
-const systemConfig = require("../../config/system");
-const ProductCategory = require("../../models/product-category.model");
 
 module.exports.index = async (req, res) => {
   //status
@@ -27,14 +26,14 @@ module.exports.index = async (req, res) => {
   //End search
 
   //pagination
-  const countProducts = await Product.countDocuments(find);
+  const countProductCategory = await ProductCategory.countDocuments(find);
   let objectPagination = paginationHelper(
     {
       limitItems: 4,
       currentPage: 1,
     },
     req.query,
-    countProducts
+    countProductCategory
   );
   //End pagination
 
@@ -48,14 +47,14 @@ module.exports.index = async (req, res) => {
   }
   // End sort
 
-  const products = await Product.find(find)
+  const records = await ProductCategory.find(find)
     .sort(sort)
     .limit(objectPagination.limitItems)
     .skip(objectPagination.skip);
 
-  res.render("admin/pages/products/index", {
-    titlePage: "Danh sach san pham",
-    products: products,
+  res.render("admin/pages/product-category/index", {
+    titlePage: "Danh muc san pham",
+    records: records,
     filterStatus: filterStatus,
     keyword: objectSearch.keyword,
     pagination: objectPagination,
@@ -80,35 +79,41 @@ module.exports.changeMulti = async (req, res) => {
 
   switch (type) {
     case "active":
-      await Product.updateMany({ _id: { $in: ids } }, { status: "active" });
+      await ProductCategory.updateMany(
+        { _id: { $in: ids } },
+        { status: "active" }
+      );
       req.flash(
         "success",
-        `Cap nhat trang thai thanh cong ${ids.length} san pham!`
+        `Cap nhat trang thai thanh cong ${ids.length} danh muc!`
       );
       break;
     case "unactive":
-      await Product.updateMany({ _id: { $in: ids } }, { status: "unactive" });
+      await ProductCategory.updateMany(
+        { _id: { $in: ids } },
+        { status: "unactive" }
+      );
       req.flash(
         "success",
-        `Cap nhat trang thai thanh cong ${ids.length} san pham!`
+        `Cap nhat trang thai thanh cong ${ids.length} danh muc!`
       );
       break;
     case "delete-all":
-      await Product.updateMany(
+      await ProductCategory.updateMany(
         { _id: { $in: ids } },
         { deleted: true, deletedAt: new Date() }
       );
-      req.flash("success", `Xoa thanh cong ${ids.length} san pham!`);
+      req.flash("success", `Xoa thanh cong ${ids.length} danh muc!`);
       break;
     case "change-position":
       for (const item of ids) {
         let [id, position] = item.split("-");
         position = parseInt(position);
-        await Product.updateOne({ _id: id }, { position: position });
+        await ProductCategory.updateOne({ _id: id }, { position: position });
       }
       req.flash(
         "success",
-        `Cap nhat vi tri thanh cong ${ids.length} san pham!`
+        `Cap nhat vi tri thanh cong ${ids.length} danh muc!`
       );
       break;
     default:
@@ -122,7 +127,7 @@ module.exports.changeMulti = async (req, res) => {
 module.exports.deleteItem = async (req, res) => {
   const id = req.params.id;
 
-  await Product.updateOne(
+  await ProductCategory.updateOne(
     { _id: id },
     { deleted: true, deletedAt: new Date() }
   );
@@ -134,27 +139,23 @@ module.exports.deleteItem = async (req, res) => {
 };
 
 module.exports.create = async (req, res) => {
-  res.render("admin/pages/products/create", {
-    titlePage: "Them moi san pham",
+  res.render("admin/pages/product-category/create", {
+    titlePage: "Tao danh muc san pham",
   });
 };
 
 module.exports.createPost = async (req, res) => {
-  req.body.price = parseInt(req.body.price);
-  req.body.discountPercentage = parseInt(req.body.discountPercentage);
-  req.body.stock = parseInt(req.body.stock);
-
   if (req.body.position == "") {
-    const countProducts = await Product.countDocuments();
+    const countProducts = await ProductCategory.countDocuments();
     req.body.position = countProducts + 1;
   } else {
     req.body.position = parseInt(req.body.position);
   }
 
-  const product = new Product(req.body);
-  await product.save();
+  const records = new ProductCategory(req.body);
+  await records.save();
 
-  res.redirect(`${systemConfig.prefixAdmin}/products`);
+  res.redirect(`${systemConfig.prefixAdmin}/product-category`);
 };
 
 module.exports.edit = async (req, res) => {
@@ -164,26 +165,23 @@ module.exports.edit = async (req, res) => {
       _id: req.params.id,
     };
 
-    const product = await Product.findOne(find);
+    const records = await ProductCategory.findOne(find);
 
-    res.render("admin/pages/products/edit", {
-      titlePage: "Chinh sua san pham",
-      product: product,
+    res.render("admin/pages/product-category/edit", {
+      titlePage: "Chinh sua danh muc",
+      records: records,
     });
   } catch (error) {
-    req.flash("error", "Khong ton tai san pham nay!");
-    res.redirect(`${systemConfig.prefixAdmin}/products`);
+    req.flash("error", "Khong ton tai danh muc nay!");
+    res.redirect(`${systemConfig.prefixAdmin}/product-category`);
   }
 };
 
 module.exports.editPatch = async (req, res) => {
-  req.body.price = parseInt(req.body.price);
-  req.body.discountPercentage = parseInt(req.body.discountPercentage);
-  req.body.stock = parseInt(req.body.stock);
   req.body.position = parseInt(req.body.position);
 
   try {
-    await Product.updateOne({ _id: req.params.id }, req.body);
+    await ProductCategory.updateOne({ _id: req.params.id }, req.body);
     req.flash("success", "Cap nhat thanh cong!");
   } catch (error) {
     req.flash("error", "Cap nhat that bai!");
@@ -200,14 +198,14 @@ module.exports.detail = async (req, res) => {
       _id: req.params.id,
     };
 
-    const product = await Product.findOne(find);
+    const records = await ProductCategory.findOne(find);
 
-    res.render("admin/pages/products/detail", {
-      titlePage: "Chi tiet san pham",
-      product: product,
+    res.render("admin/pages/product-category/detail", {
+      titlePage: "Chi tiet danh muc",
+      records: records,
     });
   } catch (error) {
-    req.flash("error", "Khong ton tai san pham nay!");
-    res.redirect(`${systemConfig.prefixAdmin}/products`);
+    req.flash("error", "Khong ton tai danh muc nay!");
+    res.redirect(`${systemConfig.prefixAdmin}/product-category`);
   }
 };

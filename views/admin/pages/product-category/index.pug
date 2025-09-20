@@ -11,7 +11,7 @@ block main
     +alert-error(5000)
 
     .container.mb-5
-        h1.display-4.text-center Danh sach san pham
+        h1.display-4.text-center Danh muc san pham
 
     .card.mb-3 
         .card-header Bo loc va tim kiem 
@@ -25,14 +25,14 @@ block main
                     +search(keyword)  
 
     .card.mb-3 
-        .card-header Danh sach
+        .card-header Danh muc
         .card-body
             .row
                 .col-8
-                    +form-change-multi(`${prefixAdmin}/products/change-multi?_method=PATCH`)
+                    +form-change-multi(`${prefixAdmin}/product-category/change-multi?_method=PATCH`)
                 .col-4 
                     a(
-                        href=`${prefixAdmin}/products/create`
+                        href=`${prefixAdmin}/product-category/create`
                         class="btn btn-outline-success"
                     ) + Them moi
 
@@ -43,13 +43,12 @@ block main
                             input(type="checkbox" name="checkAll")
                         th STT 
                         th Hinh anh 
-                        th Tieu de 
-                        th Gia 
+                        th Tieu de  
                         th Vi tri
                         th Trang thai 
                         th Hanh dong
-                tbody 
-                    each item, index in products 
+                tbody
+                    each item, index in records
                         tr 
                             td 
                                 input(type="checkbox" name="id" value=item.id)
@@ -57,7 +56,6 @@ block main
                             td 
                                 img(src=item.thumbnail, alt=item.title, width="100px", height="auto")
                             td #{item.title}
-                            td #{item.price}$
                             td
                                 input(
                                     type="number"
@@ -73,22 +71,23 @@ block main
                                     a(href="javascript:", button-change-status, data-status=item.status, data-id=item.id,class="badge badge-danger") Dung hoat dong
                             td 
                                 a(
-                                    href=`${prefixAdmin}/products/detail/${item.id}`
+                                    href=`${prefixAdmin}/product-category/detail/${item.id}`
                                     class="btn btn-secondary btn-sm"
                                 ) Chi tiet
                                 a(
-                                    href=`${prefixAdmin}/products/edit/${item.id}`
+                                    href=`${prefixAdmin}/product-category/edit/${item.id}`
                                     class="btn btn-warning btn-sm"
                                 ) Sua
                                 button(class="btn btn-danger btn-sm ml-1" data-id=item.id button-delete) Xoa
 
     +pagination(pagination)
 
-    form(action="" method="POST" id="form-change-status" data-path=`${prefixAdmin}/products/change-status`) 
+    form(action="" method="POST" id="form-change-status" data-path=`${prefixAdmin}/product-category/change-status`) 
 
-    form(action="" method="POST" id="form-delete-item" data-path=`${prefixAdmin}/products/delete`)
+    form(action="" method="POST" id="form-delete-item" data-path=`${prefixAdmin}/product-category/delete`)
 
     script(src="/admin/js/product.js")
+                
 
 
 

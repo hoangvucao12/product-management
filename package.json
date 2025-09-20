@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
@@ -21,7 +22,8 @@
     "mongoose-slug-updater": "^3.3.0",
     "multer": "^2.0.2",
     "pug": "^3.0.3",
-    "serverless-http": "^4.0.0"
+    "streamifier": "^0.1.1",
+    "tinymce": "^8.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

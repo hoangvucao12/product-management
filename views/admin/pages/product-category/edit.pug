@@ -4,11 +4,12 @@ include ../../mixins/alert.pug
 
 block main 
     +alert-error(5000)
+    +alert-success(5000)
 
-    h1(class="mb-4 text-center") Tạo mới sản phẩm 
+    h1(class="mb-4 text-center") Chinh sua danh muc
 
     form(
-        action=`${prefixAdmin}/products/create`
+        action=`${prefixAdmin}/product-category/edit/${records.id}?_method=PATCH`
         id="form-create-product"
         method="POST"
         enctype="multipart/form-data"
@@ -21,6 +22,7 @@ block main
                 id="title"
                 name="title"
                 required 
+                value=records.title
             )
             
         div(class="form-group") 
@@ -30,52 +32,10 @@ block main
                 id="desc"
                 name="description"
                 rows="5" 
-            )
-
-        div(class="form-group") 
-            label(for="desc") Noi dung
-            textarea(
-                class="form-control textarea-mce"
-                id="content"
-                name="content"
-                rows="5" 
-            )
-
-        div(class="form-group") 
-            label(for="price") Giá
-            input(
-                type="number"
-                class="form-control"
-                id="price"
-                name="price"
-                value="0"
-                min="0"
-            )
-
-        div(class="form-group") 
-            label(for="discount") % Giảm giá
-            input(
-                type="number"
-                class="form-control"
-                id="discount"
-                name="discountPercentage"
-                value="0"
-                min="0"
-            )
-
-        div(class="form-group") 
-            label(for="stock") Số lượng
-            input(
-                type="number"
-                class="form-control"
-                id="stock"
-                name="stock"
-                value="0"
-                min="0"
-            )
+            ) #{records.description}
 
         div(
-            class="form-group upload-image"
+            class="form-group upload-image has-image"
             upload-image 
         )
             label(for="thumbnail") Ảnh
@@ -89,7 +49,7 @@ block main
             )
             <span class="close-image">x</span>
             img(
-                src=""
+                src=records.thumbnail
                 upload-image-preview
                 class="upload-image-preview"
             )
@@ -103,6 +63,7 @@ block main
                 name="position"
                 placeholder="Tự động tăng"
                 min="1"
+                value=records.position
             )
 
         div(class="form-group form-check form-check-inline") 
@@ -112,7 +73,7 @@ block main
                 id="statusActive"
                 name="status"
                 value="active"
-                checked
+                checked=(records.status == "active" ? true : false)
             )
             label(for="statusActive" class="form-check-label") Hoạt động 
 
@@ -123,6 +84,7 @@ block main
                 id="statusInActive"
                 name="status"
                 value="unactive"
+                checked=(records.status == "unactive" ? true : false)
             )
             label(for="statusInActive" class="form-check-label") Dừng hoạt động
     
@@ -130,6 +92,8 @@ block main
             button(
                 type="submit"
                 class="btn btn-primary"
-            ) Tạo mới 
+            ) Cap nhat 
 
     script(src="/admin/js/product.js")
+
+    

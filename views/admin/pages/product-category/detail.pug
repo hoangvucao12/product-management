@@ -1,0 +1,34 @@
+extends ../../layouts/default.pug
+
+block main 
+    div(class="container-detail")
+        if (records.title) 
+            h1(class="mb-4") #{records.title}
+
+        if (records.thumbnail) 
+            div(class="mb-4")
+                img(
+                    src=records.thumbnail 
+                    style="width: 100px"
+                )
+
+        if (records.status) 
+            div(class="mb-4")
+                span Trạng thái:
+                if (records.status === "active")
+                    span(class="badge bg-success") Hoạt động
+                else 
+                    span(class="badge bg-danger") Dừng hoạt động
+
+        if (records.position)
+            div(class="mb-4") Vị trí: <b>#{records.position}</b>
+
+        if (records.description)
+            div(class="mb-4 description") !{records.description}
+
+        a(
+            href=`${prefixAdmin}/product-category/edit/${records.id}`
+            class="btn btn-warning btn-sm"
+        ) Chinh sua
+
+    script(src="/admin/js/records.js")
