@@ -10,6 +10,7 @@ const bodyParser = require("body-parser");
 const flash = require("express-flash");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const dayjs = require("dayjs");
 
 database.connect();
 
@@ -17,6 +18,7 @@ const app = express();
 const port = process.env.PORT;
 
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
+app.locals.dayjs = dayjs;
 
 app.set("views", `${__dirname}/views`);
 app.set("view engine", "pug");

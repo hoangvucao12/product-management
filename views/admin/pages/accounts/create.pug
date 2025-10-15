@@ -1,0 +1,109 @@
+extends ../../layouts/default.pug 
+include ../../mixins/alert.pug
+
+block main 
+    if(role.permissions.includes("accounts_create"))
+        +alert-success(5000)
+        +alert-error(5000)
+
+        .container.mb-5
+            h1.display-4.text-center Them moi tai khoan
+
+        form(
+            action=`${prefixAdmin}/accounts/create`
+            method="POST"
+            enctype="multipart/form-data"
+        )
+            div(class="mb-3") 
+                label(for="fullName") Họ tên *
+                input(
+                    type="text"
+                    class="form-control"
+                    id="fullName"
+                    name="fullName"
+                    required 
+                )
+
+            div(class="mb-3") 
+                label(for="email") Email *
+                input(
+                    type="text"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                )
+
+            div(class="mb-3") 
+                label(for="password") Mật khẩu *
+                input(
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                )
+
+            div(class="mb-3") 
+                label(for="phone") Số điện thoại 
+                input(
+                    type="phone"
+                    class="form-control"
+                    id="phone"
+                    name="phone"
+                )
+
+            div(
+                class="mb-3 upload-image"
+                upload-image 
+            ) 
+                label(for="avatar") Avatar
+                input(
+                    type="file"
+                    class="form-control-file upload-image-input"
+                    id="avatar"
+                    name="avatar"
+                    accept="image/*"
+                    upload-image-input 
+                )
+                <span class="close-image">x</span>
+                img(
+                    src=""
+                    class="upload-image-preview "
+                    upload-image-preview 
+                )
+
+            div(class="mb-3") 
+                label(for="role_id") Phân quyền
+                select(name="role_id" id="role_id"
+                class="form-select")
+                    option(disabled) -- Chọn --
+                    each item in roles 
+                        option(value=item.id) #{item.title}
+                
+            div(class="mb-3 form-check form-check-inline") 
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusActive"
+                    name="status"
+                    value="active"
+                    checked
+                )
+                label(for="statusActive" class="form-check-label") Hoạt động 
+
+            div(class="mb-3 form-check form-check-inline") 
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusInActive"
+                    name="status"
+                    value="inactive"
+                )
+                label(for="statusInActive" class="form-check-label") Dừng hoạt động
+        
+            div(class="mb-3")
+                button(
+                    type="submit"
+                    class="btn btn-primary"
+                ) Tạo mới 
+
+

@@ -3,6 +3,7 @@ const systemConfig = require("../../config/system");
 const filterStatusHelper = require("../../helpers/filterStatus");
 const searchHelper = require("../../helpers/search");
 const paginationHelper = require("../../helpers/pagination");
+const selectTreeHelper = require("../../helpers/selectTree");
 
 module.exports.index = async (req, res) => {
   //status
@@ -139,8 +140,16 @@ module.exports.deleteItem = async (req, res) => {
 };
 
 module.exports.create = async (req, res) => {
+  let find = {
+    deleted: false,
+  };
+
+  const records = await ProductCategory.find(find);
+  const newRecords = selectTreeHelper(records);
+
   res.render("admin/pages/product-category/create", {
     titlePage: "Tao danh muc san pham",
+    records: newRecords,
   });
 };
 
@@ -166,10 +175,15 @@ module.exports.edit = async (req, res) => {
     };
 
     const records = await ProductCategory.findOne(find);
+    const recordAll = await ProductCategory.find({
+      deleted: false,
+    });
+    const newRecordAll = selectTreeHelper(recordAll);
 
     res.render("admin/pages/product-category/edit", {
       titlePage: "Chinh sua danh muc",
       records: records,
+      newRecordAll: newRecordAll,
     });
   } catch (error) {
     req.flash("error", "Khong ton tai danh muc nay!");
@@ -198,11 +212,18 @@ module.exports.detail = async (req, res) => {
       _id: req.params.id,
     };
 
+    let parentTitle = null;
+
     const records = await ProductCategory.findOne(find);
+    if (records.parent_id) {
+      const parent = await ProductCategory.findOne({ _id: records.parent_id });
+      parentTitle = parent.title;
+    }
 
     res.render("admin/pages/product-category/detail", {
       titlePage: "Chi tiet danh muc",
       records: records,
+      parentTitle: parentTitle,
     });
   } catch (error) {
     req.flash("error", "Khong ton tai danh muc nay!");

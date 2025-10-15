@@ -1,99 +1,111 @@
 extends ../../layouts/default.pug 
 include ../../mixins/alert.pug
+include ../../mixins/select-tree.pug
 
 
-block main 
-    +alert-error(5000)
-    +alert-success(5000)
 
-    h1(class="mb-4 text-center") Chinh sua danh muc
+block main
+    if(role.permissions.includes("products-category_edit"))
+        +alert-error(5000)
+        +alert-success(5000)
 
-    form(
-        action=`${prefixAdmin}/product-category/edit/${records.id}?_method=PATCH`
-        id="form-create-product"
-        method="POST"
-        enctype="multipart/form-data"
-    )
-        div(class="form-group") 
-            label(for="title") Tiêu đề
-            input(
-                type="text"
-                class="form-control"
-                id="title"
-                name="title"
-                required 
-                value=records.title
-            )
-            
-        div(class="form-group") 
-            label(for="desc") Mô tả
-            textarea(
-                class="form-control textarea-mce"
-                id="desc"
-                name="description"
-                rows="5" 
-            ) #{records.description}
+        h1(class="mb-4 text-center") Chinh sua danh muc
 
-        div(
-            class="form-group upload-image has-image"
-            upload-image 
+        form(
+            action=`${prefixAdmin}/product-category/edit/${records.id}?_method=PATCH`
+            id="form-create-product"
+            method="POST"
+            enctype="multipart/form-data"
         )
-            label(for="thumbnail") Ảnh
-            input(
-                type="file"
-                class="form-control-file upload-image-input"
-                id="thumbnail"
-                name="thumbnail"
-                accept="image/*"
-                upload-image-input
-            )
-            <span class="close-image">x</span>
-            img(
-                src=records.thumbnail
-                upload-image-preview
-                class="upload-image-preview"
-            )
+            div(class="mb-3") 
+                label(for="title") Tiêu đề
+                input(
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                    required 
+                    value=records.title
+                )
 
-        div(class="form-group") 
-            label(for="position") Vị trí
-            input(
-                type="number"
-                class="form-control"
-                id="position"
-                name="position"
-                placeholder="Tự động tăng"
-                min="1"
-                value=records.position
+            div(class="mb-3") 
+                select(
+                    name="parent_id"
+                    id="parent_id"
+                    class="form-control"
+                )
+                    option(value="") Chon danh muc cha
+                    +select-tree(newRecordAll, 1, records.parent_id)
+                
+            div(class="mb-3") 
+                label(for="desc") Mô tả
+                textarea(
+                    class="form-control textarea-mce"
+                    id="desc"
+                    name="description"
+                    rows="5" 
+                ) #{records.description}
+
+            div(
+                class="mb-3 upload-image has-image"
+                upload-image 
             )
+                label(for="thumbnail") Ảnh
+                input(
+                    type="file"
+                    class="form-control-file upload-image-input"
+                    id="thumbnail"
+                    name="thumbnail"
+                    accept="image/*"
+                    upload-image-input
+                )
+                <span class="close-image">x</span>
+                img(
+                    src=records.thumbnail
+                    upload-image-preview
+                    class="upload-image-preview"
+                )
 
-        div(class="form-group form-check form-check-inline") 
-            input(
-                type="radio"
-                class="form-check-input"
-                id="statusActive"
-                name="status"
-                value="active"
-                checked=(records.status == "active" ? true : false)
-            )
-            label(for="statusActive" class="form-check-label") Hoạt động 
+            div(class="mb-3") 
+                label(for="position") Vị trí
+                input(
+                    type="number"
+                    class="form-control"
+                    id="position"
+                    name="position"
+                    placeholder="Tự động tăng"
+                    min="1"
+                    value=records.position
+                )
 
-        div(class="form-group form-check form-check-inline") 
-            input(
-                type="radio"
-                class="form-check-input"
-                id="statusInActive"
-                name="status"
-                value="unactive"
-                checked=(records.status == "unactive" ? true : false)
-            )
-            label(for="statusInActive" class="form-check-label") Dừng hoạt động
-    
-        div(class="form-group")
-            button(
-                type="submit"
-                class="btn btn-primary"
-            ) Cap nhat 
+            div(class="mb-3 form-check form-check-inline") 
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusActive"
+                    name="status"
+                    value="active"
+                    checked=(records.status == "active" ? true : false)
+                )
+                label(for="statusActive" class="form-check-label") Hoạt động 
 
-    script(src="/admin/js/product.js")
+            div(class="mb-3 form-check form-check-inline") 
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusInActive"
+                    name="status"
+                    value="unactive"
+                    checked=(records.status == "unactive" ? true : false)
+                )
+                label(for="statusInActive" class="form-check-label") Dừng hoạt động
+        
+            div(class="mb-3")
+                button(
+                    type="submit"
+                    class="btn btn-primary"
+                ) Cap nhat 
 
-    
+        script(src="/admin/js/product.js")
+
+        

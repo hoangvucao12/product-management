@@ -1,132 +1,165 @@
 extends ../../layouts/default.pug 
 include ../../mixins/alert.pug
+include ../../mixins/select-tree.pug
 
 
 block main 
-    +alert-error(5000)
-    +alert-success(5000)
+    if(role.permissions.includes("products_edit")) 
+        +alert-error(5000)
+        +alert-success(5000)
 
-    h1(class="mb-4 text-center") Chinh sua san pham 
+        h1(class="mb-4 text-center") Chinh sua san pham 
 
-    form(
-        action=`${prefixAdmin}/products/edit/${product.id}?_method=PATCH`
-        id="form-create-product"
-        method="POST"
-        enctype="multipart/form-data"
-    )
-        div(class="form-group") 
-            label(for="title") Tiêu đề
-            input(
-                type="text"
-                class="form-control"
-                id="title"
-                name="title"
-                required 
-                value=product.title
-            )
-            
-        div(class="form-group") 
-            label(for="desc") Mô tả
-            textarea(
-                class="form-control textarea-mce"
-                id="desc"
-                name="description"
-                rows="5" 
-            ) #{product.description}
-
-        div(class="form-group") 
-            label(for="price") Giá
-            input(
-                type="number"
-                class="form-control"
-                id="price"
-                name="price"
-                value=product.price
-                min="0"
-            )
-
-        div(class="form-group") 
-            label(for="discount") % Giảm giá
-            input(
-                type="number"
-                class="form-control"
-                id="discount"
-                name="discountPercentage"
-                value=product.discountPercentage
-                min="0"
-            )
-
-        div(class="form-group") 
-            label(for="stock") Số lượng
-            input(
-                type="number"
-                class="form-control"
-                id="stock"
-                name="stock"
-                value=product.stock
-                min="0"
-            )
-
-        div(
-            class="form-group upload-image has-image"
-            upload-image 
+        form(
+            action=`${prefixAdmin}/products/edit/${product.id}?_method=PATCH`
+            id="form-create-product"
+            method="POST"
+            enctype="multipart/form-data"
         )
-            label(for="thumbnail") Ảnh
-            input(
-                type="file"
-                class="form-control-file upload-image-input"
-                id="thumbnail"
-                name="thumbnail"
-                accept="image/*"
-                upload-image-input
-            )
-            <span class="close-image">x</span>
-            img(
-                src=product.thumbnail
-                upload-image-preview
-                class="upload-image-preview"
-            )
+            div(class="mb-3") 
+                label(for="title") Tiêu đề
+                input(
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                    required 
+                    value=product.title
+                )
 
-        div(class="form-group") 
-            label(for="position") Vị trí
-            input(
-                type="number"
-                class="form-control"
-                id="position"
-                name="position"
-                placeholder="Tự động tăng"
-                min="1"
-                value=product.position
+            div(class="mb-3") 
+                label(for="product-category-id") Danh muc
+                select(
+                    name="product_category_id"
+                    id="product-category-id"
+                    class="form-control"
+                )
+                    option(value="") Chon danh muc 
+                    +select-tree(category, 1, product.product_category_id)
+
+            div(class="mb-3 form-check form-check-inline")
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="featured1"
+                    name="featured"
+                    value="1"
+                    checked=(product.featured == "1" ? true : false)
+                )
+                label(for="featured1" class="form-check-label") Noi bat
+            div(class="mb-3 form-check form-check-inline")
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="featured0"
+                    name="featured"
+                    value="0"
+                    checked=(product.featured == "0" ? true : false)
+                )
+                label(for="featured0" class="form-check-label") Khong
+                
+            div(class="mb-3") 
+                label(for="desc") Mô tả
+                textarea(
+                    class="form-control textarea-mce"
+                    id="desc"
+                    name="description"
+                    rows="5" 
+                ) #{product.description}
+
+            div(class="mb-3") 
+                label(for="price") Giá
+                input(
+                    type="number"
+                    class="form-control"
+                    id="price"
+                    name="price"
+                    value=product.price
+                    min="0"
+                )
+
+            div(class="mb-3") 
+                label(for="discount") % Giảm giá
+                input(
+                    type="number"
+                    class="form-control"
+                    id="discount"
+                    name="discountPercentage"
+                    value=product.discountPercentage
+                    min="0"
+                )
+
+            div(class="mb-3") 
+                label(for="stock") Số lượng
+                input(
+                    type="number"
+                    class="form-control"
+                    id="stock"
+                    name="stock"
+                    value=product.stock
+                    min="0"
+                )
+
+            div(
+                class="mb-3 upload-image has-image"
+                upload-image 
             )
+                label(for="thumbnail") Ảnh
+                input(
+                    type="file"
+                    class="form-control-file upload-image-input"
+                    id="thumbnail"
+                    name="thumbnail"
+                    accept="image/*"
+                    upload-image-input
+                )
+                <span class="close-image">x</span>
+                img(
+                    src=product.thumbnail
+                    upload-image-preview
+                    class="upload-image-preview"
+                )
 
-        div(class="form-group form-check form-check-inline") 
-            input(
-                type="radio"
-                class="form-check-input"
-                id="statusActive"
-                name="status"
-                value="active"
-                checked=(product.status == "active" ? true : false)
-            )
-            label(for="statusActive" class="form-check-label") Hoạt động 
+            div(class="mb-3") 
+                label(for="position") Vị trí
+                input(
+                    type="number"
+                    class="form-control"
+                    id="position"
+                    name="position"
+                    placeholder="Tự động tăng"
+                    min="1"
+                    value=product.position
+                )
 
-        div(class="form-group form-check form-check-inline") 
-            input(
-                type="radio"
-                class="form-check-input"
-                id="statusInActive"
-                name="status"
-                value="unactive"
-                checked=(product.status == "unactive" ? true : false)
-            )
-            label(for="statusInActive" class="form-check-label") Dừng hoạt động
-    
-        div(class="form-group")
-            button(
-                type="submit"
-                class="btn btn-primary"
-            ) Cap nhat 
+            div(class="mb-3 form-check form-check-inline") 
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusActive"
+                    name="status"
+                    value="active"
+                    checked=(product.status == "active" ? true : false)
+                )
+                label(for="statusActive" class="form-check-label") Hoạt động 
 
-    script(src="/admin/js/product.js")
+            div(class="mb-3 form-check form-check-inline") 
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusInActive"
+                    name="status"
+                    value="unactive"
+                    checked=(product.status == "unactive" ? true : false)
+                )
+                label(for="statusInActive" class="form-check-label") Dừng hoạt động
+        
+            div(class="mb-3")
+                button(
+                    type="submit"
+                    class="btn btn-primary"
+                ) Cap nhat 
 
-    
+        script(src="/admin/js/product.js")
+
+        

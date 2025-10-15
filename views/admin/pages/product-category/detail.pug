@@ -5,6 +5,9 @@ block main
         if (records.title) 
             h1(class="mb-4") #{records.title}
 
+        if (records.parent_id)
+            h1(class="mb-4") #{parentTitle}
+
         if (records.thumbnail) 
             div(class="mb-4")
                 img(
@@ -25,10 +28,10 @@ block main
 
         if (records.description)
             div(class="mb-4 description") !{records.description}
-
-        a(
-            href=`${prefixAdmin}/product-category/edit/${records.id}`
-            class="btn btn-warning btn-sm"
-        ) Chinh sua
+        if(role.permissions.includes("products-category_edit"))
+            a(
+                href=`${prefixAdmin}/product-category/edit/${records.id}`
+                class="btn btn-warning btn-sm"
+            ) Chinh sua
 
     script(src="/admin/js/records.js")

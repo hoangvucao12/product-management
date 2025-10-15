@@ -1,19 +1,25 @@
 extends ../../layouts/default.pug 
+include ../../mixins/box-head.pug
+include ../../mixins/alert.pug
 
-block main 
+block main
+    +alert-success(5000)
     .product-detail 
         .container.my-5
             .row 
-                .col-6
+                .col-3.box-image
                     .inner-thumb 
                         img(src=product.thumbnail, alt=product.title)
-                .col-6 
+                .col-5.box-desc 
+                    h1(class="inner-title") Mô tả sản phẩm
+                    .inner-desc !{product.description}
+                .col-3.box-content 
                     h1(class="inner-title") #{product.title} 
 
                     if (product.category)
                         div(class="inner-category")
-                        span Danh mục: 
-                        a(href=`/products/${product.category.slug}`) #{product.category.title}
+                            span Danh mục: 
+                            a(href=`/products/${product.category.slug}`) #{product.category.title}
                             
                     if (product.priceNew) 
                         div(class="inner-price-new") #{product.priceNew}$
@@ -31,28 +37,20 @@ block main
                         action=`/cart/add/${product.id}`
                         method="POST"
                     )
-                        input(
-                            class="form-control mb-2"
-                            type="number"
-                            name="quantity"
-                            value="1"
-                            min="1"
-                            max=product.stock 
-                        )
+                        .quantity-selector
+                            button(type="button" class="btn-desc") -
+                            input(
+                                class="form-control mb-2"
+                                type="number"
+                                name="quantity"
+                                value="1"
+                                min="1"
+                                max=product.stock 
+                            )
+                            button(type="button" class="btn-asc") +
                         button(
                             type="submit"
-                            class="btn btn-success btn-block"
+                            class="btn btn-success"
                         ) Thêm vào giỏ hàng 
                     
-        hr
 
-        //- .container.my-5
-        //-     .row 
-        //-         .col-12 
-        //-             +box-head("Mô tả sản phẩm")
-        //-             .inner-desc !{product.description}
-
-        //-     button(
-        //-         class="btn btn-secondary"
-        //-         button-go-back 
-        //-     ) Trở lại 

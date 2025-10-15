@@ -4,6 +4,9 @@ block main
     div(class="container-detail")
         if (product.title) 
             h1(class="mb-4") #{product.title}
+        
+        if (product.product_category_id)
+            h1(class="mb-4") #{categoryTitle}
 
         if (product.price) 
             div(class="mb-4") Giá: <b>#{product.price}$</b>
@@ -35,9 +38,10 @@ block main
         if (product.description)
             div(class="mb-4 description") !{product.description}
 
-        a(
-            href=`${prefixAdmin}/products/edit/${product.id}`
-            class="btn btn-warning btn-sm"
-        ) Chinh sua
+        if(role.permissions.includes("products_edit")) 
+            a(
+                href=`${prefixAdmin}/products/edit/${product.id}`
+                class="btn btn-warning btn-sm"
+            ) Chinh sua
 
     script(src="/admin/js/product.js")

@@ -7,12 +7,6 @@ cloudinary.config({
   api_secret: process.env.SECRET,
 });
 
-// cloudinary.config({
-//   cloud_name: "dcihvhlne",
-//   api_key: "476732632746216",
-//   api_secret: "Jo5sbXsJcR2csJW4GKbFcmpZqlM",
-// });
-
 module.exports.upload = (req, res, next) => {
   if (req.file) {
     let streamUpload = (req) => {

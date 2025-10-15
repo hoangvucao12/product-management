@@ -4,6 +4,8 @@ const searchHelper = require("../../helpers/search");
 const paginationHelper = require("../../helpers/pagination");
 const systemConfig = require("../../config/system");
 const ProductCategory = require("../../models/product-category.model");
+const selectTreeHelper = require("../../helpers/selectTree");
+const Account = require("../../models/account.model");
 
 module.exports.index = async (req, res) => {
   //status
@@ -53,6 +55,25 @@ module.exports.index = async (req, res) => {
     .limit(objectPagination.limitItems)
     .skip(objectPagination.skip);
 
+  for (const product of products) {
+    const userCreate = await Account.findOne({
+      _id: product.createdBy.account_id,
+    });
+    if (userCreate) {
+      product.accountFullName = userCreate.fullName;
+    }
+
+    if (product.updatedBy.length > 0) {
+      const userUpdateNew = await Account.findOne({
+        _id: product.updatedBy[product.updatedBy.length - 1].account_id,
+      });
+      if (userUpdateNew) {
+        product.updatedBy[product.updatedBy.length - 1].accountFullName =
+          userUpdateNew.fullName;
+      }
+    }
+  }
+
   res.render("admin/pages/products/index", {
     titlePage: "Danh sach san pham",
     products: products,
@@ -66,7 +87,18 @@ module.exports.changeStatus = async (req, res) => {
   const status = req.params.status;
   const id = req.params.id;
 
-  await ProductCategory.updateOne({ _id: id }, { status: status });
+  const updatedBy = {
+    account_id: res.locals.user.id,
+    updatedAt: new Date(),
+  };
+
+  await Product.updateOne(
+    { _id: id },
+    {
+      status: status,
+      $push: { updatedBy: updatedBy },
+    }
+  );
 
   req.flash("success", "Cap nhat trang thai thanh cong!");
 
@@ -78,16 +110,27 @@ module.exports.changeMulti = async (req, res) => {
   const type = req.body.type;
   const ids = req.body.ids.split(", ");
 
+  const updatedBy = {
+    account_id: res.locals.user.id,
+    updatedAt: new Date(),
+  };
+
   switch (type) {
     case "active":
-      await Product.updateMany({ _id: { $in: ids } }, { status: "active" });
+      await Product.updateMany(
+        { _id: { $in: ids } },
+        { status: "active", $push: { updatedBy: updatedBy } }
+      );
       req.flash(
         "success",
         `Cap nhat trang thai thanh cong ${ids.length} san pham!`
       );
       break;
     case "unactive":
-      await Product.updateMany({ _id: { $in: ids } }, { status: "unactive" });
+      await Product.updateMany(
+        { _id: { $in: ids } },
+        { status: "unactive", $push: { updatedBy: updatedBy } }
+      );
       req.flash(
         "success",
         `Cap nhat trang thai thanh cong ${ids.length} san pham!`
@@ -104,7 +147,10 @@ module.exports.changeMulti = async (req, res) => {
       for (const item of ids) {
         let [id, position] = item.split("-");
         position = parseInt(position);
-        await Product.updateOne({ _id: id }, { position: position });
+        await Product.updateOne(
+          { _id: id },
+          { position: position, $push: { updatedBy: updatedBy } }
+        );
       }
       req.flash(
         "success",
@@ -124,18 +170,31 @@ module.exports.deleteItem = async (req, res) => {
 
   await Product.updateOne(
     { _id: id },
-    { deleted: true, deletedAt: new Date() }
+    {
+      deleted: true,
+      deletedBy: {
+        account_id: res.locals.user.id,
+        deletedAt: new Date(),
+      },
+    }
   );
   req.flash("success", "Xoa thanh cong san pham");
 
   let backURL = req.get("referer");
-
   res.redirect(`${backURL}`);
 };
 
 module.exports.create = async (req, res) => {
+  let find = {
+    deleted: false,
+  };
+
+  const records = await ProductCategory.find(find);
+  const category = selectTreeHelper(records);
+
   res.render("admin/pages/products/create", {
     titlePage: "Them moi san pham",
+    category: category,
   });
 };
 
@@ -151,6 +210,10 @@ module.exports.createPost = async (req, res) => {
     req.body.position = parseInt(req.body.position);
   }
 
+  req.body.createdBy = {
+    account_id: res.locals.user.id,
+  };
+
   const product = new Product(req.body);
   await product.save();
 
@@ -164,11 +227,18 @@ module.exports.edit = async (req, res) => {
       _id: req.params.id,
     };
 
+    let findCategory = {
+      deleted: false,
+    };
+
     const product = await Product.findOne(find);
+    const records = await ProductCategory.find(findCategory);
+    const category = selectTreeHelper(records);
 
     res.render("admin/pages/products/edit", {
       titlePage: "Chinh sua san pham",
       product: product,
+      category: category,
     });
   } catch (error) {
     req.flash("error", "Khong ton tai san pham nay!");
@@ -183,7 +253,18 @@ module.exports.editPatch = async (req, res) => {
   req.body.position = parseInt(req.body.position);
 
   try {
-    await Product.updateOne({ _id: req.params.id }, req.body);
+    const updatedBy = {
+      account_id: res.locals.user.id,
+      updatedAt: new Date(),
+    };
+
+    await Product.updateOne(
+      { _id: req.params.id },
+      {
+        ...req.body,
+        $push: { updatedBy: updatedBy },
+      }
+    );
     req.flash("success", "Cap nhat thanh cong!");
   } catch (error) {
     req.flash("error", "Cap nhat that bai!");
@@ -200,11 +281,20 @@ module.exports.detail = async (req, res) => {
       _id: req.params.id,
     };
 
+    let categoryTitle = "";
+
     const product = await Product.findOne(find);
+    if (product.product_category_id) {
+      const category = await ProductCategory.findOne({
+        _id: product.product_category_id,
+      });
+      categoryTitle = category.title;
+    }
 
     res.render("admin/pages/products/detail", {
       titlePage: "Chi tiet san pham",
       product: product,
+      categoryTitle: categoryTitle,
     });
   } catch (error) {
     req.flash("error", "Khong ton tai san pham nay!");

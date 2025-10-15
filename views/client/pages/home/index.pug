@@ -1,5 +1,51 @@
 extends ../../layouts/default.pug
 include ../../mixins/box-head.pug
+include ../../mixins/product-layout.pug
 
 block main
-  +box-head("Trang chu", "Day la doan mo to cua trang chu")
+  .container-home
+    .inner-wrap
+      .category
+        .menu
+          .inner-title
+            p Danh mục
+          .sub-menu
+            ul
+              each item in layoutProductsCategory
+                li 
+                  a(href=`/products/${item.slug}`)
+                    .inner-image 
+                      img(src=item.thumbnail)
+                    .inner-titleCategory #{item.title} 
+      .content
+        .container.slideImg.my-5
+          .wrap
+            button.arrow.arrow-left
+                i.fa-solid.fa-arrow-left
+            button.arrow.arrow-right
+                i.fa-solid.fa-arrow-right
+            .slides
+                .slide(style="background-image: url('https://salt.tikicdn.com/cache/w750/ts/tikimsp/d4/33/c5/28763661c71738c464f39747410f2305.png.webp')" aria-label="Ảnh 1")
+                .slide(style="background-image: url('https://salt.tikicdn.com/cache/w750/ts/tikimsp/85/55/16/c56f2e554aaf5b50ac75f300fa89bd62.png.webp')" aria-label="Ảnh 2")
+                .slide(style="background-image: url('https://salt.tikicdn.com/cache/w750/ts/tikimsp/70/97/8d/33f8deb84717cc643ad6da14d795fff8.png.webp')" aria-label="Ảnh 3")
+                .slide(style="background-image: url('https://salt.tikicdn.com/cache/w750/ts/tikimsp/13/bc/ef/0c5919f523f5b67ea3b2ac6119b798d0.png.webp')" aria-label="Ảnh 4")
+                .slide(style="background-image: url('https://salt.tikicdn.com/cache/w750/ts/tikimsp/8e/ec/63/1809e791acfa7b1cdaded1ccf11f9393.png.webp')" aria-label="Ảnh 5")
+            .dots(role="tablist")
+                span.dot.active(role="tab" tabindex="0" aria-selected="true" aria-controls="slide1")
+                span.dot(role="tab" tabindex="-1" aria-selected="false" aria-controls="slide2")
+                span.dot(role="tab" tabindex="-1" aria-selected="false" aria-controls="slide3")
+                span.dot(role="tab" tabindex="-1" aria-selected="false" aria-controls="slide4")
+                span.dot(role="tab" tabindex="-1" aria-selected="false" aria-controls="slide5")
+        .container.my-5
+          .row 
+            .col-12 
+              +box-head("Sản phẩm nổi bật")
+          +product-grid(productsFeatured)
+
+          .container.my-5
+            .row 
+              .col-12 
+                +box-head("Sản phẩm mới")
+            +product-grid(productsNew)
+
+  script(src="/js/slider.js")

@@ -1,23 +1,35 @@
 extends ../../layouts/default.pug
 include ../../mixins/box-head.pug
+include ../../mixins/product-layout.pug
+include ../../mixins/alert.pug
 
 block main
-  .container.my-3                
-    .row
-      .col-12
-        +box-head("Danh sach san pham")
-    .row
-      each item in products 
-        .col-4.mb-3
-          a(
-            href=`/products/${item.slug}`
-          )
-            .product-item
-              .inner-image
-                img(src=item.thumbnail)
-              .inner-content
-                h3.inner-title #{item.title}
-                .inner-price-new #{item.priceNew}$
-                .inner-price-old #{item.price}$
-                .inner-discount -#{item.discountPercentage}%
+  if(listSubCategory.length > 0)
+    .container-home
+      .inner-wrap
+        .category
+          .menu
+            .inner-title
+              p Danh mục
+            .sub-menu
+              ul
+                each item in listSubCategory
+                  li 
+                    a(href=`/products/${item.slug}`)
+                      .inner-image 
+                        img(src=item.thumbnail)
+                      .inner-titleCategory #{item.title} 
+        .content
+          .container.my-5                
+            .row
+              .col-12
+                +box-head(titlePage)
+            +product-grid(products)
+  else 
+    .container.my-5                
+      .row
+        .col-12
+          +box-head(titlePage)
+      +product-grid(products)
+
 
